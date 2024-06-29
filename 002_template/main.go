@@ -11,7 +11,7 @@ type data struct {
 }
 
 func main() {
-	tpl, err := template.ParseFiles("tpl.gohtml")
+	tpl, err := template.ParseFiles("tpl.gotmpl")
 	if err != nil {
 		log.Fatalln(err)
 	}

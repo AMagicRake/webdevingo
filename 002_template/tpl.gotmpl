@@ -20,6 +20,11 @@
 </head>
 <body>
 <h1>{{ .Heading }} - Second Template</h1>
+{{template "nestedDiv" .}}
 </body>
 </html>
+{{end}}
+
+{{block "nestedDiv" .}}
+<div> This was nested in the template! {{.}}</div>
 {{end}}

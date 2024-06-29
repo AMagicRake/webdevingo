@@ -16,7 +16,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	err = tpl.ExecuteTemplate(os.Stdout, "index", data{"Test Replace"})
+	err = tpl.ExecuteTemplate(os.Stdout, "index2", data{"Test Replace"})
 	if err != nil {
 		log.Fatalln(err)
 	}

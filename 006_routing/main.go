@@ -5,28 +5,21 @@ import (
 	"net/http"
 )
 
-type dog int
-type cat int
-type index int
-
-func (dog) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func ServeDog(res http.ResponseWriter, req *http.Request) {
 	io.WriteString(res, "doggy")
 }
 
-func (cat) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func ServeCat(res http.ResponseWriter, req *http.Request) {
 	io.WriteString(res, "kitty")
 }
-func (index) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func ServeIndex(res http.ResponseWriter, req *http.Request) {
 	io.WriteString(res, "Hello!")
 }
 
 func main() {
-	var d dog
-	var c cat
-	var i index
-	mux := http.NewServeMux()
-	mux.Handle("/", i)
-	mux.Handle("/dog", d)
-	mux.Handle("/cat", c)
-	http.ListenAndServe(":8080", mux)
+	// mux := http.NewServeMux()
+	http.HandleFunc("/", ServeIndex)
+	http.HandleFunc("/dog", ServeDog)
+	http.HandleFunc("/cat", ServeCat)
+	http.ListenAndServe(":8080", nil)
 }

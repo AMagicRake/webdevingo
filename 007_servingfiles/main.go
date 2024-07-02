@@ -2,6 +2,7 @@ package main
 
 import (
 	"io"
+	"log"
 	"net/http"
 	"os"
 )
@@ -10,7 +11,7 @@ func main() {
 	http.HandleFunc("/", index)
 	// http.HandleFunc("/shocked_pikachu.jpg", shockedPikachu)
 	http.Handle("/img/", http.StripPrefix("/img", http.FileServer(http.Dir("./img"))))
-	http.ListenAndServe(":8080", nil)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func index(w http.ResponseWriter, req *http.Request) {

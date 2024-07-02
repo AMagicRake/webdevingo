@@ -23,12 +23,14 @@ func shockedPikachu(w http.ResponseWriter, req *http.Request) {
 	f, err := os.Open("img/shocked_pikachu.jpg")
 	if err != nil {
 		http.Error(w, "File not Found", 404)
+		return
 	}
 	defer f.Close()
 
 	fi, err := f.Stat()
 	if err != nil {
 		http.Error(w, "File not Found", 404)
+		return
 	}
 
 	http.ServeContent(w, req, f.Name(), fi.ModTime(), f)

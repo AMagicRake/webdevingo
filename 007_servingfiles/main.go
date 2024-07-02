@@ -11,6 +11,7 @@ func main() {
 	http.HandleFunc("/", index)
 	// http.HandleFunc("/shocked_pikachu.jpg", shockedPikachu)
 	http.Handle("/img/", http.StripPrefix("/img", http.FileServer(http.Dir("./img"))))
+	http.Handle("/favicon.ico", http.NotFoundHandler())
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 

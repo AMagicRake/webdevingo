@@ -17,9 +17,6 @@ func indexPage(w http.ResponseWriter, req *http.Request) {
 
 	c, err := req.Cookie("my-cookie")
 	if err != nil {
-		fmt.Println("No Cookie Found")
-	}
-	if err != nil {
 		newCookie := &http.Cookie{Name: "my-cookie", Value: "Niel"}
 		fmt.Println(newCookie)
 		http.SetCookie(w, newCookie)

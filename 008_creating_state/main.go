@@ -5,6 +5,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 )
 
 var tpl *template.Template
@@ -33,7 +35,7 @@ func formParam(w http.ResponseWriter, req *http.Request) {
 func formUpload(w http.ResponseWriter, req *http.Request) {
 	var s string
 	if req.Method == http.MethodPost {
-		f, _, err := req.FormFile("q")
+		f, h, err := req.FormFile("q")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -46,6 +48,19 @@ func formUpload(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 		s = string(bs)
+
+		dst, err := os.Create(filepath.Join("./uploads/", h.Filename))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer dst.Close()
+
+		_, err = dst.Write(bs)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

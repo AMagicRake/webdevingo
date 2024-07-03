@@ -1,0 +1,31 @@
+{{block "index" .}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1>303-See Other</h1>
+<form method="POST" action="/seeOther">
+    <input type="text" name="fname">
+    <input type="submit">
+</form>
+
+<h1>301-Temporary Redirect</h1>
+<form method="POST" action="/temporaryRedirect">
+    <input type="text" name="fname">
+    <input type="submit">
+</form>
+
+
+<h1>307-Moved Permenantly</h1>
+<form method="POST" action="/movedPermenantly">
+    <input type="text" name="fname">
+    <input type="submit">
+</form>
+
+</body>
+</html>
+{{end}}

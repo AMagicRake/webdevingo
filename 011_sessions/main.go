@@ -31,9 +31,9 @@ func indexPage(w http.ResponseWriter, req *http.Request) {
 	c, err := req.Cookie("sessionID")
 	if err != nil {
 		sessionId := uuid.New()
-		newCookie := &http.Cookie{Name: "sessionID", Value: sessionId.String()}
-		fmt.Println(newCookie)
-		http.SetCookie(w, newCookie)
+		c := &http.Cookie{Name: "sessionID", Value: sessionId.String()}
+		fmt.Println(c)
+		http.SetCookie(w, c)
 	}
 
 	var u user

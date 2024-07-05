@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -14,12 +15,26 @@ type user struct {
 	Last     string
 }
 
+type session struct {
+	un           string
+	lastActivity time.Time
+}
+
 var tpl *template.Template
 var dbUsers = map[string]user{}
-var dbSessions = map[string]string{}
+var dbSessions = map[string]session{}
+var dbSessionsCleaned time.Time
+
+// const sessionLength int = 30
+
+func init() {
+
+	tpl = template.Must(template.ParseFiles("views.gotmpl"))
+	dbSessionsCleaned = time.Now()
+}
 
 func main() {
-	tpl = template.Must(template.ParseFiles("views.gotmpl"))
+
 	http.HandleFunc("/", indexPage)
 	http.HandleFunc("/bar", bar)
 	http.Handle("/favicon.ico", http.NotFoundHandler())
@@ -37,17 +52,26 @@ func indexPage(w http.ResponseWriter, req *http.Request) {
 	}
 
 	var u user
-	if un, ok := dbSessions[c.Value]; ok {
-		u = dbUsers[un]
+	if session, ok := dbSessions[c.Value]; ok {
+		u = dbUsers[session.un]
 	}
 
 	if req.Method == http.MethodPost {
-		un := req.FormValue("username")
+		uName := req.FormValue("username")
 		f := req.FormValue("firstname")
 		l := req.FormValue("lastname")
-		u = user{un, f, l}
-		dbSessions[c.Value] = un
-		dbUsers[un] = u
+		u = user{uName, f, l}
+		dbSessions[c.Value] = session{uName, time.Now()}
+		dbUsers[uName] = u
+	}
+
+	if time.Since(dbSessionsCleaned) > (time.Second * 30) {
+		for k, v := range dbSessions {
+			if time.Since(v.lastActivity) > (time.Second * 30) {
+				delete(dbSessions, k)
+			}
+		}
+		dbSessionsCleaned = time.Now()
 	}
 
 	tpl.ExecuteTemplate(w, "index", u)
@@ -60,10 +84,12 @@ func bar(w http.ResponseWriter, req *http.Request) {
 		http.Redirect(w, req, "/", http.StatusSeeOther)
 	}
 
-	un, ok := dbSessions[c.Value]
+	session, ok := dbSessions[c.Value]
 	if !ok {
 		http.Redirect(w, req, "/", http.StatusSeeOther)
 	}
-	u := dbUsers[un]
+	session.lastActivity = time.Now()
+	dbSessions[c.Value] = session
+	u := dbUsers[session.un]
 	tpl.ExecuteTemplate(w, "bar", u)
 }

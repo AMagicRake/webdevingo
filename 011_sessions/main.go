@@ -25,7 +25,7 @@ var dbUsers = map[string]user{}
 var dbSessions = map[string]session{}
 var dbSessionsCleaned time.Time
 
-const sessionLength int = 30
+const sessionLength time.Duration = (time.Second * 30)
 
 func init() {
 
@@ -48,7 +48,7 @@ func indexPage(w http.ResponseWriter, req *http.Request) {
 		sessionId := uuid.New()
 		c := &http.Cookie{Name: "sessionID",
 			Value:  sessionId.String(),
-			MaxAge: sessionLength,
+			MaxAge: int(sessionLength / time.Second),
 		}
 		fmt.Println(c)
 		http.SetCookie(w, c)
@@ -68,9 +68,9 @@ func indexPage(w http.ResponseWriter, req *http.Request) {
 		dbUsers[uName] = u
 	}
 
-	if time.Since(dbSessionsCleaned) > (time.Second * 30) {
+	if time.Since(dbSessionsCleaned) > sessionLength {
 		for k, v := range dbSessions {
-			if time.Since(v.lastActivity) > (time.Second * 30) {
+			if time.Since(v.lastActivity) > sessionLength {
 				delete(dbSessions, k)
 			}
 		}
@@ -94,7 +94,7 @@ func bar(w http.ResponseWriter, req *http.Request) {
 	session.lastActivity = time.Now()
 	dbSessions[c.Value] = session
 	u := dbUsers[session.un]
-	c.MaxAge = sessionLength
+	c.MaxAge = int(sessionLength / time.Second)
 	//update cookie length
 	http.SetCookie(w, c)
 	tpl.ExecuteTemplate(w, "bar", u)

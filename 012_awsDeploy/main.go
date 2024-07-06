@@ -12,4 +12,6 @@ func main() {
 
 func index(w http.ResponseWriter, req *http.Request) {
 	io.WriteString(w, "Oh yeah, I'm running on AWS.")
+	io.WriteString(w, "Test git ignore update")
+
 }

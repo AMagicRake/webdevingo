@@ -20,21 +20,21 @@ type session struct {
 	lastActivity time.Time
 }
 
-var tpl *template.Template
-var dbUsers = map[string]user{}
-var dbSessions = map[string]session{}
-var dbSessionsCleaned time.Time
+var (
+	tpl               *template.Template
+	dbUsers           = map[string]user{}
+	dbSessions        = map[string]session{}
+	dbSessionsCleaned time.Time
+)
 
 const sessionLength time.Duration = (time.Second * 30)
 
 func init() {
-
 	tpl = template.Must(template.ParseFiles("views.gotmpl"))
 	dbSessionsCleaned = time.Now()
 }
 
 func main() {
-
 	http.HandleFunc("/", indexPage)
 	http.HandleFunc("/bar", bar)
 	http.Handle("/favicon.ico", http.NotFoundHandler())
@@ -42,11 +42,11 @@ func main() {
 }
 
 func indexPage(w http.ResponseWriter, req *http.Request) {
-
 	c, err := req.Cookie("sessionID")
 	if err != nil {
 		sessionId := uuid.New()
-		c := &http.Cookie{Name: "sessionID",
+		c := &http.Cookie{
+			Name:   "sessionID",
 			Value:  sessionId.String(),
 			MaxAge: int(sessionLength / time.Second),
 		}
@@ -78,7 +78,6 @@ func indexPage(w http.ResponseWriter, req *http.Request) {
 	}
 
 	tpl.ExecuteTemplate(w, "index", u)
-
 }
 
 func bar(w http.ResponseWriter, req *http.Request) {
@@ -95,7 +94,7 @@ func bar(w http.ResponseWriter, req *http.Request) {
 	dbSessions[c.Value] = session
 	u := dbUsers[session.un]
 	c.MaxAge = int(sessionLength / time.Second)
-	//update cookie length
+	// update cookie length
 	http.SetCookie(w, c)
 	tpl.ExecuteTemplate(w, "bar", u)
 }

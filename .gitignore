@@ -1,2 +1,3 @@
 .vscode
 012_awsDeploy/main
+*.pem

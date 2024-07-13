@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"mvc_example/models"
 	"net/http"
 
@@ -33,7 +34,7 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	u := models.User{}
 
-	json.NewDecoder(r.Body).Decode(&u)
+	log.Fatal(json.NewDecoder(r.Body).Decode(&u))
 
 	//should probably generate uuid but examples
 	u.Id = "007"

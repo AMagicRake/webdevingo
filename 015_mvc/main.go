@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"mvc_example/models"
+	"mvc_example/controllers"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -11,10 +9,11 @@ import (
 
 func main() {
 	r := httprouter.New()
+	uc := controllers.NewUserController()
 	r.GET("/", index)
-	r.GET("/user/:id", getUser)
-	r.POST("/user", createUser)
-	r.DELETE("/user/:id", deleteUser)
+	r.GET("/user/:id", uc.GetUser)
+	r.POST("/user", uc.CreateUser)
+	r.DELETE("/user/:id", uc.DeleteUser)
 	http.ListenAndServe("localhost:8080", r)
 }
 
@@ -32,39 +31,4 @@ func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(s))
-}
-
-func getUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	u := models.User{
-		Name:   "James Bond",
-		Gender: "Male",
-		Age:    32,
-		Id:     p.ByName("id"),
-	}
-
-	uj, _ := json.Marshal(u)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "%s\n", uj)
-}
-
-func createUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	u := models.User{}
-
-	json.NewDecoder(r.Body).Decode(&u)
-
-	//should probably generate uuid but examples
-	u.Id = "007"
-
-	uj, _ := json.Marshal(u)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	fmt.Fprintf(w, "%s\n", uj)
-}
-
-func deleteUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "Write code to delete user\n")
 }

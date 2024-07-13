@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -8,12 +9,15 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type UserController struct{}
+type UserController struct {
+	session *mongo.Collection
+}
 
-func NewUserController() *UserController {
-	return &UserController{}
+func NewUserController(s *mongo.Collection) *UserController {
+	return &UserController{s}
 }
 
 func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -37,7 +41,12 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p ht
 	log.Fatal(json.NewDecoder(r.Body).Decode(&u))
 
 	//should probably generate uuid but examples
-	u.Id = "007"
+
+	_, err := uc.session.InsertOne(context.Background(), u)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	uj, _ := json.Marshal(u)
 

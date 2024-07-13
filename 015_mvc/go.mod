@@ -1,4 +1,4 @@
-module mv_example
+module mvc_example
 
 go 1.22.5
 

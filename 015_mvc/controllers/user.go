@@ -10,6 +10,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 type UserController struct {
@@ -41,8 +42,12 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, p ht
 	log.Fatal(json.NewDecoder(r.Body).Decode(&u))
 
 	//should probably generate uuid but examples
+	err := uc.session.Database().Client().Ping(context.Background(), readpref.Primary())
+	if err != nil {
+		log.Fatalln()
+	}
 
-	_, err := uc.session.InsertOne(context.Background(), u)
+	_, err = uc.session.InsertOne(context.Background(), u)
 
 	if err != nil {
 		log.Fatalln(err)
